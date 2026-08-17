@@ -1,0 +1,626 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b4f8a">
+<title>BHU MCA All Semester SGPA & CGPA Calculator</title>
+<style>
+*{box-sizing:border-box}
+:root{--blue:#0b4f8a;--dark:#07365d;--light:#eef6ff;--border:#d9e2ec;--green:#166534;--red:#b91c1c}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#edf5fb,#f8fafc);color:#14202b}
+.wrap{max-width:920px;margin:auto;padding:16px}
+header{background:linear-gradient(135deg,var(--dark),var(--blue));color:#fff;padding:25px 22px;border-radius:18px;box-shadow:0 10px 28px rgba(7,54,93,.18)}
+header h1{margin:0;font-size:26px} header p{margin:7px 0 0;opacity:.92}
+.badge{display:inline-block;margin-top:12px;background:rgba(255,255,255,.14);padding:6px 10px;border-radius:20px;font-size:12px}
+.card{background:#fff;border:1px solid #e7edf3;border-radius:17px;padding:20px;margin-top:15px;box-shadow:0 6px 22px rgba(15,23,42,.06)}
+h2{margin:0 0 14px;color:var(--dark);font-size:20px} h3{margin:0;color:#174f82;font-size:17px}
+.note{font-size:13px;color:#64748b;line-height:1.55}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sem-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px}
+.sem-tab{
+padding:12px 8px;
+border:1px solid var(--border);
+background:#fff;
+color:#07365d !important;
+border-radius:10px;
+font-weight:800;
+cursor:pointer;
+transition:all .18s ease;
+-webkit-appearance:none;
+appearance:none;
+opacity:1 !important;
+}
+.sem-tab:hover,
+.sem-tab:focus-visible{
+background:#0b5b96 !important;
+color:#fff !important;
+border-color:#0b5b96 !important;
+transform:translateY(-1px);
+box-shadow:0 5px 14px rgba(7,54,93,.18);
+outline:none;
+}
+.sem-tab.active{
+background:#0b5b96 !important;
+color:#fff !important;
+border-color:#0b5b96 !important;
+}
+.sem-tab.active:hover{
+background:#084a7b !important;
+color:#fff !important;
+}
+.sem-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.sem-content{display:none}.sem-content.active{display:block}
+.course{border:1px solid var(--border);border-radius:14px;padding:16px;margin:12px 0;background:#fbfdff}
+.course-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}
+.credit{background:#e8f2fb;color:var(--blue);padding:5px 9px;border-radius:20px;font-size:12px;font-weight:bold;white-space:nowrap}
+label{display:block;font-weight:bold;font-size:14px;margin:8px 0 6px}
+input{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:16px;background:#fff}
+input:focus{outline:2px solid rgba(11,79,138,.12);border-color:var(--blue)}
+.marks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.final{margin-top:11px;padding:10px 12px;border-radius:9px;background:#eef6ff;color:var(--dark);font-weight:bold}
+.formula{background:#f8fafc;border:1px dashed #cbd5e1;padding:12px;border-radius:10px;font-size:13px;margin-top:12px;line-height:1.55}
+button{width:100%;border:0;border-radius:11px;padding:14px;background:var(--blue);color:#fff;font-size:17px;font-weight:bold;cursor:pointer}
+button:hover{background:var(--dark)} .reset{margin-top:9px;background:#e8eef4;color:var(--dark)}
+.result{display:none;background:#ecfdf3;border:1px solid #bbf7d0}
+.student-head{display:flex;gap:16px;align-items:center;margin-bottom:14px}
+.student-photo{width:88px;height:108px;border-radius:10px;object-fit:cover;border:1px solid #cbd5e1;background:#f1f5f9;display:none}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.metric{background:#fff;border-radius:12px;padding:14px}.metric small{display:block;color:#64748b}.metric strong{font-size:25px;color:var(--green)}
+.table-wrap{overflow-x:auto} table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
+th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left} th{background:#f1f5f9}
+.download-row{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
+.download{background:#166534}
+.warning{margin-top:12px;padding:11px;border-radius:9px;background:#fff7ed;color:#9a3412;font-size:12px;line-height:1.5}
+footer{text-align:center;color:#64748b;font-size:12px;padding:20px}
+@media(max-width:600px){.grid,.marks,.metrics,.download-row{grid-template-columns:1fr}.sem-tabs{grid-template-columns:repeat(2,1fr)}header h1{font-size:22px}}
+
+/* Responsive/mobile-first enhancements */
+*{box-sizing:border-box}
+body{width:100%;overflow-x:hidden}
+.container,.card,.app,.wrapper{max-width:100%;width:100%}
+input,select,button{max-width:100%;font-size:16px}
+.marks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.course{width:100%}
+@media(max-width:700px){
+  body{padding:10px}
+  .card{padding:16px;border-radius:14px}
+  h1{font-size:24px}
+  h2{font-size:20px}
+  h3{font-size:17px}
+  .marks{grid-template-columns:1fr}
+  .semester-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .semester-tabs button{width:100%;padding:10px 5px;font-size:13px}
+  .student-grid,.info-grid,.metrics{grid-template-columns:1fr!important}
+  .result-table{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{min-width:650px}
+  .result-card{overflow:hidden}
+  .photo-preview{max-width:100%;height:auto}
+}
+@media(max-width:420px){
+  body{padding:6px}
+  .card{padding:12px}
+  .semester-tabs{grid-template-columns:repeat(2,1fr)}
+  button{min-height:46px}
+  input{min-height:44px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>BHU MCA — SGPA & CGPA Calculator</h1>
+<p>Semester I • Semester II • Semester III • Semester IV</p>
+<span class="badge">Complete MCA • 80 Credits</span>
+</header>
+
+<section class="card">
+<h2>Student Details</h2>
+<div class="grid">
+<div><label>Student Name *</label><input id="name" type="text" placeholder="Enter your name"></div>
+<div><label>Roll Number</label><input id="roll" type="text" placeholder="Optional"></div>
+<div><label>Student Photo <span style="color:#b91c1c">* required for download</span></label><input id="photo" type="file" accept="image/*"></div>
+<div><label>Enrollment Number</label><input id="enroll" type="text" placeholder="Optional"></div>
+</div>
+</section>
+
+<section class="card">
+<h2>Select Semester</h2>
+<div class="sem-tabs">
+<button type="button" class="sem-tab active" title="Open Semester 1" aria-label="Open Semester 1" onclick="showSemester(1)">Semester 1</button>
+<button type="button" class="sem-tab" title="Open Semester 2" aria-label="Open Semester 2" onclick="showSemester(2)">Semester 2</button>
+<button type="button" class="sem-tab" title="Open Semester 3" aria-label="Open Semester 3" onclick="showSemester(3)">Semester 3</button>
+<button type="button" class="sem-tab" title="Open Semester 4" aria-label="Open Semester 4" onclick="showSemester(4)">Semester 4</button>
+</div>
+
+<div id="sem1" class="sem-content active">
+<h2 style="margin-top:20px">Semester I — 20 Credits</h2>
+<p class="note">DSA and Object Oriented Programming are calculated as Theory × 60% + Practical × 40%. Other credit courses use final marks out of 100. Non-credit Computer Organization & Operating System is not included in SGPA.</p>
+<div class="course"><div class="course-top"><h3>Data Structures and Algorithms</h3><span class="credit">6 Credits • CS108</span></div><div class="marks"><div><label>Theory *</label><input id="s1_dsa_t" class="mark" type="number" min="0" max="100" placeholder="0–100"></div><div><label>Practical *</label><input id="s1_dsa_p" class="mark" type="number" min="0" max="100" placeholder="0–100"></div></div><div class="final">Final Marks: <span id="s1_dsa_f">—</span></div></div>
+<div class="course"><div class="course-top"><h3>Object Oriented Programming</h3><span class="credit">5 Credits • CS204</span></div><div class="marks"><div><label>Theory *</label><input id="s1_oop_t" class="mark" type="number" min="0" max="100" placeholder="0–100"></div><div><label>Practical *</label><input id="s1_oop_p" class="mark" type="number" min="0" max="100" placeholder="0–100"></div></div><div class="final">Final Marks: <span id="s1_oop_f">—</span></div></div>
+<div class="course"><div class="course-top"><h3>Software Engineering</h3><span class="credit">3 Credits • CS205</span></div><label>Final Marks *</label><input id="s1_se" class="mark" type="number" min="0" max="100" placeholder="0–100"></div>
+<div class="course"><div class="course-top"><h3>Computer Networks</h3><span class="credit">4 Credits • CS206</span></div><label>Final Marks *</label><input id="s1_cn" class="mark" type="number" min="0" max="100" placeholder="0–100"></div>
+<div class="course"><div class="course-top"><h3>Communication Skills</h3><span class="credit">2 Credits • CS401</span></div><label>Final Marks *</label><input id="s1_comm" class="mark" type="number" min="0" max="100" placeholder="0–100"></div>
+</div>
+
+<div id="sem2" class="sem-content">
+<h2 style="margin-top:20px">Semester II — 20 Credits</h2>
+
+<div class="course">
+<div class="course-top"><h3>Database Management Systems</h3><span class="credit">6 Credits • CS107</span></div>
+<div class="marks">
+<div><label>Theory *</label><input id="s2_dbms_t" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
+<div><label>Practical *</label><input id="s2_dbms_p" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
+</div>
+<div class="final">Final Marks: <span id="s2_dbms_f">—</span></div>
+</div>
+
+<div class="course">
+<div class="course-top"><h3>Artificial Intelligence</h3><span class="credit">4 Credits • CS208</span></div>
+<label>Final Marks *</label>
+<input id="s2_ai" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+</div>
+
+<div class="course">
+<div class="course-top"><h3>Major Elective I</h3><span class="credit">4 Credits</span></div>
+<label>Elective Subject Name *</label>
+<input id="s2_elective1_name" type="text" placeholder="Enter elective subject name">
+<div class="marks">
+<div><label>Theory *</label><input id="s2_elective1_t" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
+<div><label>Practical *</label><input id="s2_elective1_p" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
+</div>
+<div class="final">Final Marks: <span id="s2_elective1_f">—</span></div>
+</div>
+
+<div class="course">
+<div class="course-top"><h3>Major Elective II</h3><span class="credit">4 Credits</span></div>
+<label>Elective Subject Name *</label>
+<input id="s2_elective2_name" type="text" placeholder="Enter elective subject name">
+<div class="marks">
+<div><label>Theory *</label><input id="s2_elective2_t" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
+<div><label>Practical *</label><input id="s2_elective2_p" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
+</div>
+<div class="final">Final Marks: <span id="s2_elective2_f">—</span></div>
+</div>
+
+<div class="course">
+<div class="course-top"><h3>SWAYAM</h3><span class="credit">2 Credits</span></div>
+<label>Final Marks *</label>
+<input id="s2_swayam" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+</div>
+
+<p class="note">DBMS, Major Elective I and Major Elective II: Theory × 60% + Practical × 40%. Artificial Intelligence and SWAYAM: final marks out of 100.</p>
+</div>
+
+<div id="sem3" class="sem-content">
+<h2 style="margin-top:20px">Semester III — 20 Credits</h2>
+<p class="note">Machine Learning and both Major Electives are calculated as Theory × 60% + Practical × 40%. Enter the actual elective subject names; the calculator displays them as Major Elective III and IV. Technical Writing & Seminar, SWAYAM and Minor Project use direct marks out of 100.</p>
+<div class="course"><div class="course-top"><h3>Machine Learning</h3><span class="credit">5 Credits • CS209</span></div><div class="marks"><div><label>Theory *</label><input id="s3_ml_t" class="mark" type="number" min="0" max="100"></div><div><label>Practical *</label><input id="s3_ml_p" class="mark" type="number" min="0" max="100"></div></div><div class="final">Final Marks: <span id="s3_ml_f">—</span></div></div>
+<div class="course"><div class="course-top"><h3>Major Elective III</h3><span class="credit">4 Credits</span></div><label>Elective Subject Name *</label><input id="s3_elective3_name" type="text" placeholder="Enter elective subject name"><div class="marks"><div><label>Theory *</label><input id="s3_elective3_t" class="mark" type="number" min="0" max="100"></div><div><label>Practical *</label><input id="s3_elective3_p" class="mark" type="number" min="0" max="100"></div></div><div class="final">Final Marks: <span id="s3_elective3_f">—</span></div></div>
+<div class="course"><div class="course-top"><h3>Major Elective IV</h3><span class="credit">4 Credits</span></div><label>Elective Subject Name *</label><input id="s3_elective4_name" type="text" placeholder="Enter elective subject name"><div class="marks"><div><label>Theory *</label><input id="s3_elective4_t" class="mark" type="number" min="0" max="100"></div><div><label>Practical *</label><input id="s3_elective4_p" class="mark" type="number" min="0" max="100"></div></div><div class="final">Final Marks: <span id="s3_elective4_f">—</span></div></div>
+<div class="course"><div class="course-top"><h3>Technical Writing & Seminar</h3><span class="credit">2 Credits • CS402</span></div><label>Final Marks *</label><input id="s3_tw" class="mark" type="number" min="0" max="100"></div>
+<div class="course"><div class="course-top"><h3>SWAYAM</h3><span class="credit">2 Credits</span></div><label>Final Marks *</label><input id="s3_swayam" class="mark" type="number" min="0" max="100"></div>
+<div class="course"><div class="course-top"><h3>Minor Project</h3><span class="credit">3 Credits • CS501</span></div><label>Final Marks *</label><input id="s3_project" class="mark" type="number" min="0" max="100"></div>
+</div>
+
+<div id="sem4" class="sem-content">
+<h2 style="margin-top:20px">Semester IV — 20 Credits</h2>
+<p class="note">The Reading Elective C slot is replaced by SWAYAM. Enter final marks out of 100.</p>
+<div class="course"><div class="course-top"><h3>SWAYAM</h3><span class="credit">2 Credits</span></div><label>Final Marks *</label><input id="s4_swayam" class="mark" type="number" min="0" max="100"></div>
+<div class="course"><div class="course-top"><h3>Comprehensive Viva</h3><span class="credit">2 Credits • CS406</span></div><label>Final Marks *</label><input id="s4_viva" class="mark" type="number" min="0" max="100"></div>
+<div class="course"><div class="course-top"><h3>Major Project / Industrial Training</h3><span class="credit">16 Credits • CS504/CS505</span></div><label>Final Marks *</label><input id="s4_project" class="mark" type="number" min="0" max="100"></div>
+</div>
+</section>
+
+<section class="card">
+<h2>Calculate</h2>
+<p class="note">The selected semester will be calculated. If you want cumulative CGPA, enter the SGPA of the other completed semesters below.</p>
+<div class="grid">
+<div><label>Semester I SGPA</label><input id="old_s1" type="number" min="0" max="10" step="0.01" placeholder="Optional"></div>
+<div><label>Semester II SGPA</label><input id="old_s2" type="number" min="0" max="10" step="0.01" placeholder="Optional"></div>
+<div><label>Semester III SGPA</label><input id="old_s3" type="number" min="0" max="10" step="0.01" placeholder="Optional"></div>
+<div><label>Semester IV SGPA</label><input id="old_s4" type="number" min="0" max="10" step="0.01" placeholder="Optional"></div>
+</div>
+<div class="formula"><b>Grade:</b> 90–100 S/10 • 80–89 A/9 • 70–79 B/8 • 60–69 C/7 • 50–59 D/6 • 40–49 E/5 • &lt;40 F/0<br><b>Percentage:</b> (CGPA × 10) − 4.5</div>
+<button onclick="calculate()">Calculate Selected Semester</button>
+<button class="reset" onclick="resetAll()">Reset</button>
+</section>
+
+<section class="card result" id="result">
+<h2>Result</h2>
+<div class="student-head"><img id="resultPhoto" class="student-photo" alt="Student Photo"><p id="student"></p></div>
+<div class="metrics">
+<div class="metric"><small id="semesterLabel">Semester SGPA</small><strong id="sgpa">—</strong></div>
+<div class="metric"><small>Semester Percentage</small><strong id="semPercent">—</strong></div>
+<div class="metric"><small>Cumulative CGPA</small><strong id="cgpa">—</strong></div>
+<div class="metric"><small>Cumulative Percentage</small><strong id="cumPercent">—</strong></div>
+</div>
+<div class="table-wrap"><table><thead><tr><th>Course</th><th>Final Marks</th><th>Grade</th><th>GP</th><th>Credits</th><th>Credit Points</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div class="download-row">
+<button class="download" onclick="downloadResult()">Download Result</button>
+</div>
+<div class="warning">Student photo is compulsory for downloading the result. This is an unofficial calculator result, not an official BHU marksheet.</div>
+</section>
+
+<footer>BHU MCA SGPA & CGPA Calculator • Unofficial student utility<br><strong>Made with ❤️ by Dhirendra Pratap Singh</strong></footer>
+</div>
+
+<script>
+let selectedSemester=1, studentPhotoData="";
+
+function showSemester(n){
+ selectedSemester=n;
+ document.querySelectorAll(".sem-content").forEach(x=>x.classList.remove("active"));
+ document.getElementById("sem"+n).classList.add("active");
+ document.querySelectorAll(".sem-tab").forEach(x=>x.classList.remove("active"));
+ document.querySelectorAll(".sem-tab")[n-1].classList.add("active");
+}
+function grade(m){
+ if(m>=90)return ["S",10]; if(m>=80)return ["A",9]; if(m>=70)return ["B",8];
+ if(m>=60)return ["C",7]; if(m>=50)return ["D",6]; if(m>=40)return ["E",5]; return ["F",0];
+}
+function mark(id){
+ const v=document.getElementById(id).value.trim(); if(v==="")return null;
+ const n=Number(v); return Number.isFinite(n)&&n>=0&&n<=100?n:null;
+}
+function weighted(t,p){const a=mark(t),b=mark(p);return a===null||b===null?null:a*.6+b*.4}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+function safe(s){return String(s).replace(/[^a-z0-9]+/gi,"_").replace(/^_+|_+$/g,"")||"Student"}
+
+function getCourses(n){
+ if(n===1)return [
+  ["s1_dsa","Data Structures and Algorithms",6,"s1_dsa_t","s1_dsa_p"],
+  ["s1_oop","Object Oriented Programming",5,"s1_oop_t","s1_oop_p"],
+  ["s1_se","Software Engineering",3],
+  ["s1_cn","Computer Networks",4],
+  ["s1_comm","Communication Skills",2]
+ ];
+ if(n===2)return [
+  ["s2_dbms","Database Management Systems",6,"s2_dbms_t","s2_dbms_p"],
+  ["s2_ai","Artificial Intelligence",4],
+  ["s2_elective1","Major Elective I",4,"s2_elective1_t","s2_elective1_p"],
+  ["s2_elective2","Major Elective II",4,"s2_elective2_t","s2_elective2_p"],
+  ["s2_swayam","SWAYAM",2]
+ ];
+ if(n===3)return [
+  ["s3_ml","Machine Learning",5,"s3_ml_t","s3_ml_p"],
+  ["s3_elective3","Major Elective III",4,"s3_elective3_t","s3_elective3_p"],
+  ["s3_elective4","Major Elective IV",4,"s3_elective4_t","s3_elective4_p"],
+  ["s3_tw","Technical Writing & Seminar",2],
+  ["s3_swayam","SWAYAM",2],
+  ["s3_project","Minor Project",3]
+ ];
+ return [
+  ["s4_swayam","SWAYAM",2],
+  ["s4_viva","Comprehensive Viva",2],
+  ["s4_project","Major Project / Industrial Training",16]
+ ];
+}
+
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbyPxYnqWP2PWVnI5a2EKpePZRWfWDMeN0U91znfaNYWbVFyGUhNUNzDgneRXNUZQZYCTQ/exec";
+
+function saveResponseToGoogleSheet(payload){
+  const iframeName = "sheetSaveFrame";
+  let iframe = document.getElementById(iframeName);
+  if(!iframe){
+    iframe = document.createElement("iframe");
+    iframe.name = iframeName;
+    iframe.id = iframeName;
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
+  }
+
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = GOOGLE_SHEETS_URL;
+  form.target = iframeName;
+  form.style.display = "none";
+
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.name = "payload";
+  input.value = JSON.stringify(payload);
+  form.appendChild(input);
+
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(() => form.remove(), 3000);
+}
+
+function buildSheetPayload(){
+  const courses = getCourses(selectedSemester);
+  const subjects = [];
+
+  for(const c of courses){
+    const subject = {
+      name: c[1],
+      credits: c[2],
+      finalMarks: null,
+      grade: null,
+      gradePoint: null,
+      theory: null,
+      practical: null
+    };
+
+    if(c[3]){
+      subject.theory = Number(document.getElementById(c[3]).value);
+      subject.practical = Number(document.getElementById(c[4]).value);
+      subject.finalMarks = Number((subject.theory * 0.6 + subject.practical * 0.4).toFixed(2));
+    } else {
+      subject.finalMarks = Number(document.getElementById(c[0]).value);
+    }
+
+    const g = grade(subject.finalMarks);
+    subject.grade = g[0];
+    subject.gradePoint = g[1];
+    subjects.push(subject);
+  }
+
+  return {
+    timestamp: new Date().toISOString(),
+    name: document.getElementById("name").value.trim(),
+    rollNo: document.getElementById("roll").value.trim(),
+    enrollmentNo: document.getElementById("enroll").value.trim(),
+    semester: "Semester " + selectedSemester,
+    sgpa: document.getElementById("sgpa").textContent,
+    semesterPercentage: document.getElementById("semPercent").textContent,
+    cgpa: document.getElementById("cgpa").textContent,
+    cumulativePercentage: document.getElementById("cumPercent").textContent,
+    subjects: subjects
+  };
+}
+
+function calculate(){
+ const name=document.getElementById("name").value.trim();
+ if(!name){
+   alert("Please enter the student's name.");
+   document.getElementById("name").focus();
+   return;
+ }
+
+ if(selectedSemester===2){
+   if(!document.getElementById("s2_elective1_name").value.trim() ||
+      !document.getElementById("s2_elective2_name").value.trim()){
+     alert("Please enter the names of Major Elective I and Major Elective II.");
+     return;
+   }
+ }
+
+ if(selectedSemester===3){
+   if(!document.getElementById("s3_elective3_name").value.trim() ||
+      !document.getElementById("s3_elective4_name").value.trim()){
+     alert("Please enter the names of Major Elective III and Major Elective IV.");
+     return;
+   }
+ }
+
+ const courses=getCourses(selectedSemester);
+ let total=0,credits=0,rows="";
+
+ for(const c of courses){
+   const m=c[3] ? weighted(c[3],c[4]) : mark(c[0]);
+
+   if(m===null){
+     alert("Please enter valid marks (0–100) for every subject in Semester "+selectedSemester+".");
+     return;
+   }
+
+   let displayName=c[1];
+   if(c[0]==="s2_elective1") displayName=document.getElementById("s2_elective1_name").value.trim();
+   if(c[0]==="s2_elective2") displayName=document.getElementById("s2_elective2_name").value.trim();
+   if(c[0]==="s3_elective3") displayName=document.getElementById("s3_elective3_name").value.trim();
+   if(c[0]==="s3_elective4") displayName=document.getElementById("s3_elective4_name").value.trim();
+
+   const g=grade(m);
+   const cp=g[1]*c[2];
+   total+=cp;
+   credits+=c[2];
+
+   rows += `<tr>
+     <td>${esc(displayName)}</td>
+     <td>${m.toFixed(2)}</td>
+     <td>${g[0]}</td>
+     <td>${g[1]}</td>
+     <td>${c[2]}</td>
+     <td>${cp}</td>
+   </tr>`;
+
+   const finalIds={
+     s1_dsa:"s1_dsa_f",
+     s1_oop:"s1_oop_f",
+     s2_dbms:"s2_dbms_f",
+     s2_elective1:"s2_elective1_f",
+     s2_elective2:"s2_elective2_f",
+     s3_ml:"s3_ml_f",
+     s3_elective3:"s3_elective3_f",
+     s3_elective4:"s3_elective4_f"
+   };
+
+   if(finalIds[c[0]]){
+     document.getElementById(finalIds[c[0]]).textContent=m.toFixed(2);
+   }
+ }
+
+ const sgpa=total/credits;
+
+ // Optional cumulative CGPA from any completed semester SGPAs entered.
+ let cgpaval=null;
+ const vals=["old_s1","old_s2","old_s3","old_s4"].map(id=>document.getElementById(id).value.trim());
+
+ if(vals.some(v=>v!=="")){
+   let sum=0,count=0;
+   for(const v of vals){
+     if(v!==""){
+       const n=Number(v);
+       if(!Number.isFinite(n)||n<0||n>10){
+         alert("Enter valid SGPA values between 0 and 10.");
+         return;
+       }
+       sum+=n;
+       count++;
+     }
+   }
+   cgpaval=sum/count;
+ }
+
+ const roll=document.getElementById("roll").value.trim();
+ const enroll=document.getElementById("enroll").value.trim();
+
+ document.getElementById("student").innerHTML=
+   "<b>Name:</b> "+esc(name)+
+   (roll?" &nbsp; | &nbsp; <b>Roll No.:</b> "+esc(roll):"")+
+   (enroll?"<br><b>Enrollment:</b> "+esc(enroll):"");
+
+ document.getElementById("semesterLabel").textContent="Semester "+selectedSemester+" SGPA";
+ document.getElementById("sgpa").textContent=sgpa.toFixed(2);
+ document.getElementById("semPercent").textContent=((sgpa*10)-4.5).toFixed(2)+"%";
+ document.getElementById("cgpa").textContent=cgpaval===null?"—":cgpaval.toFixed(2);
+ document.getElementById("cumPercent").textContent=cgpaval===null?"—":((cgpaval*10)-4.5).toFixed(2)+"%";
+ document.getElementById("rows").innerHTML=rows;
+ document.getElementById("result").style.display="block";
+
+ // Save every successfully calculated response to Google Sheets.
+ try{
+   saveResponseToGoogleSheet(buildSheetPayload());
+ }catch(err){
+   console.error("Google Sheets save failed:", err);
+ }
+
+ document.getElementById("result").scrollIntoView({behavior:"smooth"});
+}
+
+document.getElementById("photo").addEventListener("change",function(e){
+ const file=e.target.files[0]; if(!file)return;
+ if(!file.type.startsWith("image/")){alert("Please select an image file.");e.target.value="";return}
+ const r=new FileReader();r.onload=function(x){studentPhotoData=x.target.result;const img=document.getElementById("resultPhoto");img.src=studentPhotoData;img.style.display="block"};r.readAsDataURL(file);
+});
+async function downloadResult(){
+ const result=document.getElementById("result");
+
+ if(result.style.display==="none"){
+   alert("Please calculate the result first.");
+   return;
+ }
+
+ if(!studentPhotoData){
+   alert("Student photo is compulsory for downloading the result. Please upload a photo first.");
+   document.getElementById("photo").focus();
+   return;
+ }
+
+ if(!window.jspdf || !window.jspdf.jsPDF){
+   alert("PDF engine is still loading. Please wait a moment and click Download Result again.");
+   return;
+ }
+
+ const {jsPDF}=window.jspdf;
+ const doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+ const name=document.getElementById("name").value.trim() || "Student";
+ const roll=document.getElementById("roll").value.trim() || "—";
+ const enroll=document.getElementById("enroll").value.trim() || "—";
+ const sgpa=document.getElementById("sgpa").textContent;
+ const semPercent=document.getElementById("semPercent").textContent;
+ const cgpa=document.getElementById("cgpa").textContent;
+ const cumPercent=document.getElementById("cumPercent").textContent;
+
+ let y=16;
+ doc.setTextColor(7,54,93);
+ doc.setFont("helvetica","bold");
+ doc.setFontSize(18);
+ doc.text("BANARAS HINDU UNIVERSITY",105,y,{align:"center"});
+ y+=8;
+ doc.setFontSize(13);
+ doc.text("MCA - Semester "+selectedSemester+" Result",105,y,{align:"center"});
+ y+=8;
+ doc.setDrawColor(11,79,138);
+ doc.line(12,y,198,y);
+ y+=9;
+
+ try{
+   const imgType=studentPhotoData.startsWith("data:image/png")?"PNG":"JPEG";
+   doc.addImage(studentPhotoData,imgType,169,y,27,34);
+ }catch(e){}
+
+ doc.setTextColor(20,32,43);
+ doc.setFont("helvetica","normal");
+ doc.setFontSize(10.5);
+ doc.text("Name: "+name,14,y+6);
+ doc.text("Roll No.: "+roll,14,y+13);
+ doc.text("Enrollment No.: "+enroll,14,y+20);
+ y+=41;
+
+ doc.setFont("helvetica","bold");
+ doc.text("Semester "+selectedSemester+" SGPA: "+sgpa,14,y);
+ doc.text("Semester Percentage: "+semPercent,106,y);
+ y+=7;
+ doc.text("Cumulative CGPA: "+cgpa,14,y);
+ doc.text("Cumulative Percentage: "+cumPercent,106,y);
+ y+=10;
+
+ // Draw result table without depending on jspdf-autotable.
+ const rows=[...document.querySelectorAll("#rows tr")].map(tr =>
+   [...tr.querySelectorAll("td")].map(td=>td.textContent.trim())
+ );
+ const headers=["Course","Final Marks","Grade","GP","Credits","Credit Points"];
+ const widths=[69,25,18,18,21,30];
+ const x0=10;
+ const rowH=7;
+ const headerH=8;
+
+ function drawRow(values, isHeader=false){
+   let x=x0;
+   doc.setFont("helvetica",isHeader?"bold":"normal");
+   doc.setFontSize(isHeader?7.5:7.2);
+   values.forEach((value,i)=>{
+     doc.setFillColor(isHeader?15:255,isHeader?76:255,isHeader?129:255);
+     doc.setDrawColor(190,198,208);
+     doc.rect(x,y,widths[i],isHeader?headerH:rowH,"FD");
+     doc.setTextColor(isHeader?255:20,isHeader?255:32,isHeader?255:43);
+     const text=String(value);
+     if(i===0 && text.length>28){
+       const parts=doc.splitTextToSize(text,widths[i]-3);
+       doc.text(parts.slice(0,2),x+1.5,y+4);
+     }else{
+       doc.text(text,x+1.5,y+4.5);
+     }
+     x+=widths[i];
+   });
+   y+=isHeader?headerH:rowH;
+ }
+
+ drawRow(headers,true);
+ rows.forEach(row=>{
+   if(y>272){
+     doc.addPage();
+     y=18;
+     drawRow(headers,true);
+   }
+   drawRow(row,false);
+ });
+
+ y+=9;
+ doc.setFont("helvetica","normal");
+ doc.setFontSize(8);
+ doc.setTextColor(80,90,100);
+ doc.text("Unofficial calculator result. Percentage formula: (CGPA × 10) - 4.5.",14,y);
+ doc.text("Made with love by Dhirendra Pratap Singh",105,289,{align:"center"});
+
+ const safeName=name.replace(/[^a-z0-9]+/gi,"_").replace(/^_+|_+$/g,"") || "Student";
+ doc.save("BHU_MCA_Semester_"+selectedSemester+"_Result_"+safeName+".pdf");
+}
+
+function resetAll(){
+ document.querySelectorAll("input").forEach(x=>x.value="");
+ studentPhotoData="";
+ document.getElementById("resultPhoto").src="";
+ document.getElementById("resultPhoto").style.display="none";
+ document.getElementById("result").style.display="none";
+ showSemester(1);
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>
