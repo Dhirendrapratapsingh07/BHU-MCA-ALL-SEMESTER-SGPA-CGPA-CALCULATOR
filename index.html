@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -223,7 +222,7 @@ input,select,button{max-width:100%;font-size:16px}
 <div><label>Semester III SGPA</label><input id="old_s3" type="number" min="0" max="10" step="0.01" placeholder="Optional"></div>
 <div><label>Semester IV SGPA</label><input id="old_s4" type="number" min="0" max="10" step="0.01" placeholder="Optional"></div>
 </div>
-<div class="formula"><b>Grade:</b> 90–100 S/10 • 80–89 A/9 • 70–79 B/8 • 60–69 C/7 • 50–59 D/6 • 40–49 E/5 • &lt;40 F/0<br><b>Percentage:</b> (CGPA × 10) − 4.5</div>
+<div class="formula"><b>Grade:</b> 90–100 S/10 • 80–89 A/9 • 70–79 B/8 • 60–69 C/7 • 50–59 D/6 • 40–49 E/5 • &lt;40 F/0<br><b>Percentage:</b> CGPA × 10 </div>
 <button onclick="calculate()">Calculate Selected Semester</button>
 <button class="reset" onclick="resetAll()">Reset</button>
 </section>
@@ -477,7 +476,7 @@ function calculate(){
  document.getElementById("sgpa").textContent=sgpa.toFixed(2);
  document.getElementById("semPercent").textContent=((sgpa*10)-4.5).toFixed(2)+"%";
  document.getElementById("cgpa").textContent=cgpaval===null?"—":cgpaval.toFixed(2);
- document.getElementById("cumPercent").textContent=cgpaval===null?"—":((cgpaval*10)-4.5).toFixed(2)+"%";
+ document.getElementById("cumPercent").textContent=cgpaval===null?"—":(cgpaval*10).toFixed(2)+"%";
  document.getElementById("rows").innerHTML=rows;
  document.getElementById("result").style.display="block";
 
@@ -604,7 +603,7 @@ async function downloadResult(){
  doc.setFont("helvetica","normal");
  doc.setFontSize(8);
  doc.setTextColor(80,90,100);
- doc.text("Unofficial calculator result. Percentage formula: (CGPA × 10) - 4.5.",14,y);
+ doc.text("Unofficial calculator result. Percentage formula: (CGPA × 10",14,y);
  doc.text("Made with love by Dhirendra Pratap Singh",105,289,{align:"center"});
 
  const safeName=name.replace(/[^a-z0-9]+/gi,"_").replace(/^_+|_+$/g,"") || "Student";
