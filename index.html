@@ -474,7 +474,7 @@ function calculate(){
 
  document.getElementById("semesterLabel").textContent="Semester "+selectedSemester+" SGPA";
  document.getElementById("sgpa").textContent=sgpa.toFixed(2);
- document.getElementById("semPercent").textContent=(sgpa*10).toFixed(2)+"%";
+ document.getElementById("semPercent").textContent=sgpa*10.toFixed(2)+"%";
  document.getElementById("cgpa").textContent=cgpaval===null?"—":cgpaval.toFixed(2);
  document.getElementById("cumPercent").textContent=cgpaval===null?"—":(cgpaval*10).toFixed(2)+"%";
  document.getElementById("rows").innerHTML=rows;
