@@ -4,170 +4,660 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b4f8a">
-<title>BHU MCA All Semester SGPA & CGPA Calculator</title>
+<title>BHU MCA All Semester SGPA &amp; CGPA Calculator</title>
+
 <style>
 *{box-sizing:border-box}
-:root{--blue:#0b4f8a;--dark:#07365d;--light:#eef6ff;--border:#d9e2ec;--green:#166534;--red:#b91c1c}
-body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#edf5fb,#f8fafc);color:#14202b}
+:root{
+  --blue:#0b4f8a;
+  --dark:#07365d;
+  --light:#eef6ff;
+  --border:#d9e2ec;
+  --green:#166534;
+  --red:#b91c1c
+}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#edf5fb,#f8fafc);
+  color:#14202b
+}
 .wrap{max-width:920px;margin:auto;padding:16px}
-header{background:linear-gradient(135deg,var(--dark),var(--blue));color:#fff;padding:25px 22px;border-radius:18px;box-shadow:0 10px 28px rgba(7,54,93,.18)}
-header h1{margin:0;font-size:26px} header p{margin:7px 0 0;opacity:.92}
-.badge{display:inline-block;margin-top:12px;background:rgba(255,255,255,.14);padding:6px 10px;border-radius:20px;font-size:12px}
-.card{background:#fff;border:1px solid #e7edf3;border-radius:17px;padding:20px;margin-top:15px;box-shadow:0 6px 22px rgba(15,23,42,.06)}
-h2{margin:0 0 14px;color:var(--dark);font-size:20px} h3{margin:0;color:#174f82;font-size:17px}
+header{
+  background:linear-gradient(135deg,var(--dark),var(--blue));
+  color:#fff;
+  padding:25px 22px;
+  border-radius:18px;
+  box-shadow:0 10px 28px rgba(7,54,93,.18)
+}
+header h1{margin:0;font-size:26px}
+header p{margin:7px 0 0;opacity:.92}
+.badge{
+  display:inline-block;
+  margin-top:12px;
+  background:rgba(255,255,255,.14);
+  padding:6px 10px;
+  border-radius:20px;
+  font-size:12px
+}
+.card{
+  background:#fff;
+  border:1px solid #e7edf3;
+  border-radius:17px;
+  padding:20px;
+  margin-top:15px;
+  box-shadow:0 6px 22px rgba(15,23,42,.06)
+}
+h2{margin:0 0 14px;color:var(--dark);font-size:20px}
+h3{margin:0;color:#174f82;font-size:17px}
 .note{font-size:13px;color:#64748b;line-height:1.55}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.sem-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px}
+.sem-tabs{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:15px
+}
 .sem-tab{
-padding:12px 8px;
-border:1px solid var(--border);
-background:#fff;
-color:#07365d !important;
-border-radius:10px;
-font-weight:800;
-cursor:pointer;
-transition:all .18s ease;
--webkit-appearance:none;
-appearance:none;
-opacity:1 !important;
+  padding:12px 8px;
+  border:1px solid var(--border);
+  background:#fff;
+  color:#07365d;
+  border-radius:10px;
+  font-weight:800;
+  cursor:pointer;
+  transition:all .18s ease;
+  appearance:none
 }
 .sem-tab:hover,
-.sem-tab:focus-visible{
-background:#0b5b96 !important;
-color:#fff !important;
-border-color:#0b5b96 !important;
-transform:translateY(-1px);
-box-shadow:0 5px 14px rgba(7,54,93,.18);
-outline:none;
-}
+.sem-tab:focus-visible,
 .sem-tab.active{
-background:#0b5b96 !important;
-color:#fff !important;
-border-color:#0b5b96 !important;
+  background:#0b5b96;
+  color:#fff;
+  border-color:#0b5b96;
+  transform:translateY(-1px);
+  box-shadow:0 5px 14px rgba(7,54,93,.18);
+  outline:none
 }
-.sem-tab.active:hover{
-background:#084a7b !important;
-color:#fff !important;
+.sem-content{display:none}
+.sem-content.active{display:block}
+.course{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  margin:12px 0;
+  background:#fbfdff
 }
-.sem-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-.sem-content{display:none}.sem-content.active{display:block}
-.course{border:1px solid var(--border);border-radius:14px;padding:16px;margin:12px 0;background:#fbfdff}
-.course-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:12px}
-.credit{background:#e8f2fb;color:var(--blue);padding:5px 9px;border-radius:20px;font-size:12px;font-weight:bold;white-space:nowrap}
-label{display:block;font-weight:bold;font-size:14px;margin:8px 0 6px}
-input{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;font-size:16px;background:#fff}
-input:focus{outline:2px solid rgba(11,79,138,.12);border-color:var(--blue)}
+.course-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+  margin-bottom:12px
+}
+.credit{
+  background:#e8f2fb;
+  color:var(--blue);
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+  white-space:nowrap
+}
+label{
+  display:block;
+  font-weight:bold;
+  font-size:14px;
+  margin:8px 0 6px
+}
+input{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font-size:16px;
+  background:#fff
+}
+input:focus{
+  outline:2px solid rgba(11,79,138,.12);
+  border-color:var(--blue)
+}
 .marks{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.final{margin-top:11px;padding:10px 12px;border-radius:9px;background:#eef6ff;color:var(--dark);font-weight:bold}
-.formula{background:#f8fafc;border:1px dashed #cbd5e1;padding:12px;border-radius:10px;font-size:13px;margin-top:12px;line-height:1.55}
-button{width:100%;border:0;border-radius:11px;padding:14px;background:var(--blue);color:#fff;font-size:17px;font-weight:bold;cursor:pointer}
-button:hover{background:var(--dark)} .reset{margin-top:9px;background:#e8eef4;color:var(--dark)}
+.final{
+  margin-top:11px;
+  padding:10px 12px;
+  border-radius:9px;
+  background:#eef6ff;
+  color:var(--dark);
+  font-weight:bold
+}
+.formula{
+  background:#f8fafc;
+  border:1px dashed #cbd5e1;
+  padding:12px;
+  border-radius:10px;
+  font-size:13px;
+  margin-top:12px;
+  line-height:1.55
+}
+button{
+  width:100%;
+  border:0;
+  border-radius:11px;
+  padding:14px;
+  background:var(--blue);
+  color:#fff;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer
+}
+button:hover{background:var(--dark)}
+.reset{margin-top:9px;background:#e8eef4;color:var(--dark)}
+.reset:hover{background:#dbe5ee}
 .result{display:none;background:#ecfdf3;border:1px solid #bbf7d0}
-.student-head{display:flex;gap:16px;align-items:center;margin-bottom:14px}
-.student-photo{width:88px;height:108px;border-radius:10px;object-fit:cover;border:1px solid #cbd5e1;background:#f1f5f9;display:none}
+.student-head{
+  display:flex;
+  gap:16px;
+  align-items:center;
+  margin-bottom:14px
+}
+.student-photo{
+  width:88px;
+  height:108px;
+  border-radius:10px;
+  object-fit:cover;
+  border:1px solid #cbd5e1;
+  background:#f1f5f9;
+  display:none
+}
 .metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.metric{background:#fff;border-radius:12px;padding:14px}.metric small{display:block;color:#64748b}.metric strong{font-size:25px;color:var(--green)}
-.table-wrap{overflow-x:auto} table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
-th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left} th{background:#f1f5f9}
-.download-row{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
+.metric{background:#fff;border-radius:12px;padding:14px}
+.metric small{display:block;color:#64748b}
+.metric strong{font-size:25px;color:var(--green)}
+.table-wrap{overflow-x:auto}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:16px;
+  font-size:14px
+}
+th,td{
+  padding:10px;
+  border-bottom:1px solid #e5e7eb;
+  text-align:left
+}
+th{background:#f1f5f9}
+.download-row{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:14px
+}
 .download{background:#166534}
-.warning{margin-top:12px;padding:11px;border-radius:9px;background:#fff7ed;color:#9a3412;font-size:12px;line-height:1.5}
-footer{text-align:center;color:#64748b;font-size:12px;padding:20px}
-@media(max-width:600px){.grid,.marks,.metrics,.download-row{grid-template-columns:1fr}.sem-tabs{grid-template-columns:repeat(2,1fr)}header h1{font-size:22px}}
-
-/* Responsive/mobile-first enhancements */
-*{box-sizing:border-box}
-body{width:100%;overflow-x:hidden}
-.container,.card,.app,.wrapper{max-width:100%;width:100%}
-input,select,button{max-width:100%;font-size:16px}
-.marks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.course{width:100%}
+.download:hover{background:#14532d}
+.warning{
+  margin-top:12px;
+  padding:11px;
+  border-radius:9px;
+  background:#fff7ed;
+  color:#9a3412;
+  font-size:12px;
+  line-height:1.5
+}
+footer{
+  text-align:center;
+  color:#64748b;
+  font-size:12px;
+  padding:20px
+}
 @media(max-width:700px){
   body{padding:10px}
+  .wrap{padding:6px}
   .card{padding:16px;border-radius:14px}
-  h1{font-size:24px}
-  h2{font-size:20px}
-  h3{font-size:17px}
+  .grid,.metrics{grid-template-columns:1fr}
   .marks{grid-template-columns:1fr}
-  .semester-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-  .semester-tabs button{width:100%;padding:10px 5px;font-size:13px}
-  .student-grid,.info-grid,.metrics{grid-template-columns:1fr!important}
-  .result-table{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .sem-tabs{grid-template-columns:repeat(2,1fr)}
+  header h1{font-size:22px}
   table{min-width:650px}
-  .result-card{overflow:hidden}
-  .photo-preview{max-width:100%;height:auto}
 }
 @media(max-width:420px){
   body{padding:6px}
   .card{padding:12px}
-  .semester-tabs{grid-template-columns:repeat(2,1fr)}
+  .sem-tabs{grid-template-columns:repeat(2,1fr)}
   button{min-height:46px}
   input{min-height:44px}
 }
-
 </style>
 </head>
+
 <body>
 <div class="wrap">
+
 <header>
-<h1>BHU MCA — SGPA & CGPA Calculator</h1>
-<p>Semester I • Semester II • Semester III • Semester IV</p>
-<span class="badge">Complete MCA • 80 Credits</span>
+  <h1>BHU MCA — SGPA &amp; CGPA Calculator</h1>
+  <p>Semester I • Semester II • Semester III • Semester IV</p>
+  <span class="badge">Complete MCA • 80 Credits</span>
 </header>
 
 <section class="card">
-<h2>Student Details</h2>
-<div class="grid">
-<div><label>Student Name *</label><input id="name" type="text" placeholder="Enter your name"></div>
-<div><label>Roll Number</label><input id="roll" type="text" placeholder="Optional"></div>
-<div><label>Student Photo <span style="color:#b91c1c">* required for download</span></label><input id="photo" type="file" accept="image/*"></div>
-<div><label>Enrollment Number</label><input id="enroll" type="text" placeholder="Optional"></div>
-</div>
+  <h2>Student Details</h2>
+  <div class="grid">
+    <div>
+      <label for="name">Student Name *</label>
+      <input id="name" type="text" placeholder="Enter your name">
+    </div>
+    <div>
+      <label for="roll">Roll Number</label>
+      <input id="roll" type="text" placeholder="Optional">
+    </div>
+    <div>
+      <label for="photo">Student Photo <span style="color:#b91c1c">* required for download</span></label>
+      <input id="photo" type="file" accept="image/*">
+    </div>
+    <div>
+      <label for="enroll">Enrollment Number</label>
+      <input id="enroll" type="text" placeholder="Optional">
+    </div>
+  </div>
 </section>
 
 <section class="card">
-<h2>Select Semester</h2>
-<div class="sem-tabs">
-<button type="button" class="sem-tab active" title="Open Semester 1" aria-label="Open Semester 1" onclick="showSemester(1)">Semester 1</button>
-<button type="button" class="sem-tab" title="Open Semester 2" aria-label="Open Semester 2" onclick="showSemester(2)">Semester 2</button>
-<button type="button" class="sem-tab" title="Open Semester 3" aria-label="Open Semester 3" onclick="showSemester(3)">Semester 3</button>
-<button type="button" class="sem-tab" title="Open Semester 4" aria-label="Open Semester 4" onclick="showSemester(4)">Semester 4</button>
+  <h2>Select Semester</h2>
+
+  <div class="sem-tabs">
+    <button type="button" class="sem-tab active" onclick="showSemester(1)">Semester 1</button>
+    <button type="button" class="sem-tab" onclick="showSemester(2)">Semester 2</button>
+    <button type="button" class="sem-tab" onclick="showSemester(3)">Semester 3</button>
+    <button type="button" class="sem-tab" onclick="showSemester(4)">Semester 4</button>
+  </div>
+
+  <div id="sem1" class="sem-content active">
+    <h2 style="margin-top:20px">Semester I — 20 Credits</h2>
+    <p class="note">DSA and Object Oriented Programming are calculated as Theory × 60% + Practical × 40%. Other credit courses use final marks out of 100. Non-credit Computer Organization &amp; Operating System is not included in SGPA.</p>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Data Structures and Algorithms</h3>
+        <span class="credit">6 Credits • CS108</span>
+      </div>
+      <div class="marks">
+        <div>
+          <label for="s1_dsa_t">Theory *</label>
+          <input id="s1_dsa_t" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+        </div>
+        <div>
+          <label for="s1_dsa_p">Practical *</label>
+          <input id="s1_dsa_p" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+        </div>
+      </div>
+      <div class="final">Final Marks: <span id="s1_dsa_f">—</span></div>
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Object Oriented Programming</h3>
+        <span class="credit">5 Credits • CS204</span>
+      </div>
+      <div class="marks">
+        <div>
+          <label for="s1_oop_t">Theory *</label>
+          <input id="s1_oop_t" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+        </div>
+        <div>
+          <label for="s1_oop_p">Practical *</label>
+          <input id="s1_oop_p" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+        </div>
+      </div>
+      <div class="final">Final Marks: <span id="s1_oop_f">—</span></div>
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Software Engineering</h3>
+        <span class="credit">3 Credits • CS205</span>
+      </div>
+      <label for="s1_se">Final Marks *</label>
+      <input id="s1_se" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Computer Networks</h3>
+        <span class="credit">4 Credits • CS206</span>
+      </div>
+      <label for="s1_cn">Final Marks *</label>
+      <input id="s1_cn" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Communication Skills</h3>
+        <span class="credit">2 Credits • CS401</span>
+      </div>
+      <label for="s1_comm">Final Marks *</label>
+      <input id="s1_comm" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+    </div>
+  </div>
+
+  <div id="sem2" class="sem-content">
+    <h2 style="margin-top:20px">Semester II — 20 Credits</h2>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Database Management Systems</h3>
+        <span class="credit">6 Credits • CS107</span>
+      </div>
+      <div class="marks">
+        <div>
+          <label for="s2_dbms_t">Theory *</label>
+          <input id="s2_dbms_t" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+        </div>
+        <div>
+          <label for="s2_dbms_p">Practical *</label>
+          <input id="s2_dbms_p" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+        </div>
+      </div>
+      <div class="final">Final Marks: <span id="s2_dbms_f">—</span></div>
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Artificial Intelligence</h3>
+        <span class="credit">4 Credits • CS208</span>
+      </div>
+      <label for="s2_ai">Final Marks *</label>
+      <input id="s2_ai" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Major Elective I</h3>
+        <span class="credit">4 Credits</span>
+      </div>
+      <label for="s2_elective1_name">Elective Subject Name *</label>
+      <input id="s2_elective1_name" type="text" placeholder="Enter elective subject name">
+      <div class="marks">
+        <div>
+          <label for="s2_elective1_t">Theory *</label>
+          <input id="s2_elective1_t" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+        </div>
+        <div>
+          <label for="s2_elective1_p">Practical *</label>
+          <input id="s2_elective1_p" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+        </div>
+      </div>
+      <div class="final">Final Marks: <span id="s2_elective1_f">—</span></div>
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Major Elective II</h3>
+        <span class="credit">4 Credits</span>
+      </div>
+      <label for="s2_elective2_name">Elective Subject Name *</label>
+      <input id="s2_elective2_name" type="text" placeholder="Enter elective subject name">
+      <div class="marks">
+        <div>
+          <label for="s2_elective2_t">Theory *</label>
+          <input id="s2_elective2_t" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+        </div>
+        <div>
+          <label for="s2_elective2_p">Practical *</label>
+          <input id="s2_elective2_p" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+        </div>
+      </div>
+      <div class="final">Final Marks: <span id="s2_elective2_f">—</span></div>
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>SWAYAM</h3>
+        <span class="credit">2 Credits</span>
+      </div>
+      <label for="s2_swayam">Final Marks *</label>
+      <input id="s2_swayam" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
+    </div>
+
+    <p class="note">DBMS, Major Elective I and Major Elective II: Theory × 60% + Practical × 40%. Artificial Intelligence and SWAYAM: final marks out of 100.</p>
+  </div>
+
+  <div id="sem3" class="sem-content">
+    <h2 style="margin-top:20px">Semester III — 20 Credits</h2>
+    <p class="note">Machine Learning and both Major Electives are calculated as Theory × 60% + Practical × 40%. Enter the actual elective subject names. Technical Writing &amp; Seminar, SWAYAM and Minor Project use direct marks out of 100.</p>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Machine Learning</h3>
+        <span class="credit">5 Credits • CS209</span>
+      </div>
+      <div class="marks">
+        <div>
+          <label for="s3_ml_t">Theory *</label>
+          <input id="s3_ml_t" class="mark" type="number" min="0" max="100" step="0.01">
+        </div>
+        <div>
+          <label for="s3_ml_p">Practical *</label>
+          <input id="s3_ml_p" class="mark" type="number" min="0" max="100" step="0.01">
+        </div>
+      </div>
+      <div class="final">Final Marks: <span id="s3_ml_f">—</span></div>
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Major Elective III</h3>
+        <span class="credit">4 Credits</span>
+      </div>
+      <label for="s3_elective3_name">Elective Subject Name *</label>
+      <input id="s3_elective3_name" type="text" placeholder="Enter elective subject name">
+      <div class="marks">
+        <div>
+          <label for="s3_elective3_t">Theory *</label>
+          <input id="s3_elective3_t" class="mark" type="number" min="0" max="100" step="0.01">
+        </div>
+        <div>
+          <label for="s3_elective3_p">Practical *</label>
+          <input id="s3_elective3_p" class="mark" type="number" min="0" max="100" step="0.01">
+        </div>
+      </div>
+      <div class="final">Final Marks: <span id="s3_elective3_f">—</span></div>
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Major Elective IV</h3>
+        <span class="credit">4 Credits</span>
+      </div>
+      <label for="s3_elective4_name">Elective Subject Name *</label>
+      <input id="s3_elective4_name" type="text" placeholder="Enter elective subject name">
+      <div class="marks">
+        <div>
+          <label for="s3_elective4_t">Theory *</label>
+          <input id="s3_elective4_t" class="mark" type="number" min="0" max="100" step="0.01">
+        </div>
+        <div>
+          <label for="s3_elective4_p">Practical *</label>
+          <input id="s3_elective4_p" class="mark" type="number" min="0" max="100" step="0.01">
+        </div>
+      </div>
+      <div class="final">Final Marks: <span id="s3_elective4_f">—</span></div>
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Technical Writing &amp; Seminar</h3>
+        <span class="credit">2 Credits • CS402</span>
+      </div>
+      <label for="s3_tw">Final Marks *</label>
+      <input id="s3_tw" class="mark" type="number" min="0" max="100" step="0.01">
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>SWAYAM</h3>
+        <span class="credit">2 Credits</span>
+      </div>
+      <label for="s3_swayam">Final Marks *</label>
+      <input id="s3_swayam" class="mark" type="number" min="0" max="100" step="0.01">
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Minor Project</h3>
+        <span class="credit">3 Credits • CS501</span>
+      </div>
+      <label for="s3_project">Final Marks *</label>
+      <input id="s3_project" class="mark" type="number" min="0" max="100" step="0.01">
+    </div>
+  </div>
+
+  <div id="sem4" class="sem-content">
+    <h2 style="margin-top:20px">Semester IV — 20 Credits</h2>
+    <p class="note">The Reading Elective C slot is replaced by SWAYAM. Enter final marks out of 100.</p>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>SWAYAM</h3>
+        <span class="credit">2 Credits</span>
+      </div>
+      <label for="s4_swayam">Final Marks *</label>
+      <input id="s4_swayam" class="mark" type="number" min="0" max="100" step="0.01">
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Comprehensive Viva</h3>
+        <span class="credit">2 Credits • CS406</span>
+      </div>
+      <label for="s4_viva">Final Marks *</label>
+      <input id="s4_viva" class="mark" type="number" min="0" max="100" step="0.01">
+    </div>
+
+    <div class="course">
+      <div class="course-top">
+        <h3>Major Project / Industrial Training</h3>
+        <span class="credit">16 Credits • CS504/CS505</span>
+      </div>
+      <label for="s4_project">Final Marks *</label>
+      <input id="s4_project" class="mark" type="number" min="0" max="100" step="0.01">
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Calculate</h2>
+  <p class="note">The selected semester will be calculated. For cumulative CGPA, enter the SGPA of other completed semesters below. The calculator assumes 20 credits per semester for cumulative weighting.</p>
+
+  <div class="grid">
+    <div>
+      <label for="old_s1">Semester I SGPA</label>
+      <input id="old_s1" type="number" min="0" max="10" step="0.01" placeholder="Optional">
+    </div>
+    <div>
+      <label for="old_s2">Semester II SGPA</label>
+      <input id="old_s2" type="number" min="0" max="10" step="0.01" placeholder="Optional">
+    </div>
+    <div>
+      <label for="old_s3">Semester III SGPA</label>
+      <input id="old_s3" type="number" min="0" max="10" step="0.01" placeholder="Optional">
+    </div>
+    <div>
+      <label for="old_s4">Semester IV SGPA</label>
+      <input id="old_s4" type="number" min="0" max="10" step="0.01" placeholder="Optional">
+    </div>
+  </div>
+
+  <div class="formula">
+    <b>Grade:</b> 90–100 S/10 • 80–89 A/9 • 70–79 B/8 • 60–69 C/7 • 50–59 D/6 • 40–49 E/5 • &lt;40 F/0
+    <br>
+    <b>Percentage:</b> CGPA × 10
+  </div>
+
+  <button type="button" onclick="calculate()">Calculate Selected Semester</button>
+  <button type="button" class="reset" onclick="resetAll()">Reset</button>
+</section>
+
+<section class="card result" id="result" aria-live="polite">
+  <h2>Result</h2>
+
+  <div class="student-head">
+    <img id="resultPhoto" class="student-photo" alt="Student Photo">
+    <p id="student"></p>
+  </div>
+
+  <div class="metrics">
+    <div class="metric">
+      <small id="semesterLabel">Semester SGPA</small>
+      <strong id="sgpa">—</strong>
+    </div>
+    <div class="metric">
+      <small>Semester Percentage</small>
+      <strong id="semPercent">—</strong>
+    </div>
+    <div class="metric">
+      <small>Cumulative CGPA</small>
+      <strong id="cgpa">—</strong>
+    </div>
+    <div class="metric">
+      <small>Cumulative Percentage</small>
+      <strong id="cumPercent">—</strong>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Course</th>
+          <th>Final Marks</th>
+          <th>Grade</th>
+          <th>GP</th>
+          <th>Credits</th>
+          <th>Credit Points</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <div class="download-row">
+    <button type="button" class="download" onclick="downloadResult()">Download Result</button>
+  </div>
+
+  <div class="warning">
+    Student photo is compulsory for downloading the result. This is an unofficial calculator result, not an official BHU marksheet.
+  </div>
+</section>
+
+<footer>
+  BHU MCA SGPA &amp; CGPA Calculator • Unofficial student utility
+  <br>
+  <strong>Made with ❤️ by Dhirendra Pratap Singh</strong>
+</footer>
 </div>
 
-<div id="sem1" class="sem-content active">
-<h2 style="margin-top:20px">Semester I — 20 Credits</h2>
-<p class="note">DSA and Object Oriented Programming are calculated as Theory × 60% + Practical × 40%. Other credit courses use final marks out of 100. Non-credit Computer Organization & Operating System is not included in SGPA.</p>
-<div class="course"><div class="course-top"><h3>Data Structures and Algorithms</h3><span class="credit">6 Credits • CS108</span></div><div class="marks"><div><label>Theory *</label><input id="s1_dsa_t" class="mark" type="number" min="0" max="100" placeholder="0–100"></div><div><label>Practical *</label><input id="s1_dsa_p" class="mark" type="number" min="0" max="100" placeholder="0–100"></div></div><div class="final">Final Marks: <span id="s1_dsa_f">—</span></div></div>
-<div class="course"><div class="course-top"><h3>Object Oriented Programming</h3><span class="credit">5 Credits • CS204</span></div><div class="marks"><div><label>Theory *</label><input id="s1_oop_t" class="mark" type="number" min="0" max="100" placeholder="0–100"></div><div><label>Practical *</label><input id="s1_oop_p" class="mark" type="number" min="0" max="100" placeholder="0–100"></div></div><div class="final">Final Marks: <span id="s1_oop_f">—</span></div></div>
-<div class="course"><div class="course-top"><h3>Software Engineering</h3><span class="credit">3 Credits • CS205</span></div><label>Final Marks *</label><input id="s1_se" class="mark" type="number" min="0" max="100" placeholder="0–100"></div>
-<div class="course"><div class="course-top"><h3>Computer Networks</h3><span class="credit">4 Credits • CS206</span></div><label>Final Marks *</label><input id="s1_cn" class="mark" type="number" min="0" max="100" placeholder="0–100"></div>
-<div class="course"><div class="course-top"><h3>Communication Skills</h3><span class="credit">2 Credits • CS401</span></div><label>Final Marks *</label><input id="s1_comm" class="mark" type="number" min="0" max="100" placeholder="0–100"></div>
-</div>
+<script>
+"use strict";
 
-<div id="sem2" class="sem-content">
-<h2 style="margin-top:20px">Semester II — 20 Credits</h2>
+let selectedSemester = 1;
+let studentPhotoData = "";
+let lastResult = null;
 
-<div class="course">
-<div class="course-top"><h3>Database Management Systems</h3><span class="credit">6 Credits • CS107</span></div>
-<div class="marks">
-<div><label>Theory *</label><input id="s2_dbms_t" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
-<div><label>Practical *</label><input id="s2_dbms_p" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
-</div>
-<div class="final">Final Marks: <span id="s2_dbms_f">—</span></div>
-</div>
+const GOOGLE_SHEETS_URL =
+  "https://script.google.com/macros/s/AKfycbyPxYnqWP2PWVnI5a2EKpePZRWfWDMeN0U91znfaNYWbVFyGUhNUNzDgneRXNUZQZYCTQ/exec";
 
-<div class="course">
-<div class="course-top"><h3>Artificial Intelligence</h3><span class="credit">4 Credits • CS208</span></div>
-<label>Final Marks *</label>
-<input id="s2_ai" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100">
-</div>
+function $(id) {
+  return document.getElementById(id);
+}
 
-<div class="course">
-<div class="course-top"><h3>Major Elective I</h3><span class="credit">4 Credits</span></div>
-<label>Elective Subject Name *</label>
-<input id="s2_elective1_name" type="text" placeholder="Enter elective subject name">
-<div class="marks">
-<div><label>Theory *</label><input id="s2_elective1_t" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
+function showSemester(n) {
+  selectedSemester = n;
+
+  document.querySelectorAll(".sem-content").forEach(el => {
+    el.classList.toggle("active", el.id === "sem" + n);
+  });
+
+  document.ype="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
 <div><label>Practical *</label><input id="s2_elective1_p" class="mark" type="number" min="0" max="100" step="0.01" placeholder="0–100"></div>
 </div>
 <div class="final">Final Marks: <span id="s2_elective1_f">—</span></div>
