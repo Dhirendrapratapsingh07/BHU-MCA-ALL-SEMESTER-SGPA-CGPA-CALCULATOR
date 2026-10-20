@@ -812,3 +812,361 @@ function calculate() {
       );
       return;
     }
+
+  const [letter, gp] = grade(m);
+
+    entries.push({
+      name: courseName(course),
+      marks: m,
+      grade: letter,
+      gp: gp,
+      credits: course[2],
+      points: gp * course[2]
+    });
+  });
+
+  if (errors.length) {
+    alert("Please correct the following:\n\n" + errors.join("\n"));
+    return;
+  }
+
+  const totalCredits = entries.reduce(
+    (sum, entry) => sum + entry.credits, 0
+  );
+
+  const totalPoints = entries.reduce(
+    (sum, entry) => sum + entry.points, 0
+  );
+
+  const sgpa = totalPoints / totalCredits;
+
+  const semesterResults = [];
+
+  for (let i = 1; i <= 4; i++) {
+    if (i === selectedSemester) {
+      semesterResults.push({
+        semester: i,
+        sgpa: sgpa,
+        credits: totalCredits
+      });
+      continue;
+    }
+
+    const field = $("old_s" + i);
+    const raw = field.value.trim();
+
+    if (raw === "") {
+      continue;
+    }
+
+    const val = Number(raw);
+
+    if (!Number.isFinite(val) || val < 0 || val > 10) {
+      alert("Semester " + i + " SGPA must be between 0 and 10.");
+      field.focus();
+      return;
+    }
+
+    semesterResults.push({
+      semester: i,
+      sgpa: val,
+      credits: 20
+    });
+  }
+
+  const cumulativeCredits = semesterResults.reduce(
+    (sum, entry) => sum + entry.credits, 0
+  );
+
+  const cgpa = semesterResults.reduce(
+    (sum, entry) => sum + entry.sgpa * entry.credits, 0
+  ) / cumulativeCredits;
+
+  $("sgpa").textContent = sgpa.toFixed(2);
+  $("semPercent").textContent = (sgpa * 10).toFixed(2) + "%";
+  $("cgpa").textContent = cgpa.toFixed(2);
+  $("cumPercent").textContent = (cgpa * 10).toFixed(2) + "%";
+
+  $("semesterLabel").textContent =
+    "Semester " + selectedSemester + " SGPA";
+
+  $("student").textContent =
+    "Name: " + name +
+    " | Roll: " + ($("roll").value.trim() || "—") +
+    " | Enrollment: " + ($("enroll").value.trim() || "—");
+
+  $("rows").innerHTML = entries.map(entry =>
+    "<tr>" +
+    "<td>" + esc(entry.name) + "</td>" +
+    "<td>" + entry.marks.toFixed(2) + "</td>" +
+    "<td>" + entry.grade + "</td>" +
+    "<td>" + entry.gp + "</td>" +
+    "<td>" + entry.credits + "</td>" +
+    "<td>" + entry.points + "</td>" +
+    "</tr>"
+  ).join("") +
+  "<tr>" +
+    "<th>Total</th><th>—</th><th>—</th><th>—</th>" +
+    "<th>" + totalCredits + "</th>" +
+    "<th>" + totalPoints + "</th>" +
+  "</tr>";
+
+  const photo = $("resultPhoto");
+
+  if (studentPhotoData) {
+    photo.src = studentPhotoData;
+    photo.style.display = "block";
+  } else {
+    photo.removeAttribute("src");
+    photo.style.display = "none";
+  }
+
+  $("result").style.display = "block";
+
+  lastResult = {
+    student: {
+      name: name,
+      roll: $("roll").value.trim(),
+      enrollment: $("enroll").value.trim()
+    },
+    semester: selectedSemester,
+    courses: entries,
+    totalCredits: totalCredits,
+    totalPoints: totalPoints,
+    sgpa: sgpa,
+    cgpa: cgpa,
+    semesterPercentage: sgpa * 10,
+    cumulativePercentage: cgpa * 10,
+    calculatedAt: new Date().toISOString()
+  };
+
+  try {
+    saveResponseToGoogleSheet(lastResult);
+  } catch (error) {
+    console.error("Google Sheets submission could not be started:", error);
+  }
+
+  $("result").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+function saveResponseToGoogleSheet(payload) {
+  if (!GOOGLE_SHEETS_URL ||
+      GOOGLE_SHEETS_URL.includes("PASTE_YOUR")) {
+    return;
+  }
+
+  let iframe = $("sheetSaveFrame");
+
+  if (!iframe) {
+    iframe = document.createElement("iframe");
+    iframe.name = "sheetSaveFrame";
+    iframe.id = "sheetSaveFrame";
+    iframe.style.display = "none";
+    document.body.appendChild(iframe);
+  }
+
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = GOOGLE_SHEETS_URL;
+  form.target = "sheetSaveFrame";
+  form.style.display = "none";
+
+  const input = document.createElement("input");
+  input.type = "hidden";
+  input.name = "payload";
+  input.value = JSON.stringify(payload);
+
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+  form.remove();
+}
+
+$("photo").addEventListener("change", function() {
+  const file = this.files && this.files[0];
+
+  studentPhotoData = "";
+
+  if (!file) {
+    $("resultPhoto").style.display = "none";
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    alert("Please choose an image file.");
+    this.value = "";
+    return;
+  }
+  const reader = new FileReader();
+
+  reader.onload = function() {
+    studentPhotoData = String(reader.result || "");
+    $("resultPhoto").src = studentPhotoData;
+    $("resultPhoto").style.display = "block";
+  };
+
+  reader.onerror = function() {
+    alert("Could not read the photo. Please choose it again.");
+    studentPhotoData = "";
+  };
+
+  reader.readAsDataURL(file);
+});
+
+function resetAll() {
+  if (!confirm("Reset all student details, marks, and results?")) {
+    return;
+  }
+
+  document.querySelectorAll("input").forEach(input => {
+    input.value = "";
+  });
+
+  studentPhotoData = "";
+  lastResult = null;
+
+  $("resultPhoto").removeAttribute("src");
+  $("resultPhoto").style.display = "none";
+  $("result").style.display = "none";
+  $("rows").innerHTML = "";
+
+  document.querySelectorAll("[id$='_f']").forEach(el => {
+    el.textContent = "—";
+  });
+
+  ["sgpa", "semPercent", "cgpa", "cumPercent"].forEach(id => {
+    $(id).textContent = "—";
+  });
+
+  $("student").textContent = "";
+
+  selectedSemester = 1;
+  showSemester(1);
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+function downloadResult() {
+  if (!lastResult) {
+    alert("Please calculate the result first.");
+    return;
+  }
+
+  if (!studentPhotoData) {
+    alert(
+      "Student photo is compulsory for downloading the result. Please upload a photo first."
+    );
+    $("photo").focus();
+    return;
+  }
+
+  const r = lastResult;
+
+  const rows = r.courses.map(entry =>
+    "<tr>" +
+    "<td>" + esc(entry.name) + "</td>" +
+    "<td>" + entry.marks.toFixed(2) + "</td>" +
+    "<td>" + entry.grade + "</td>" +
+    "<td>" + entry.gp + "</td>" +
+    "<td>" + entry.credits + "</td>" +
+    "<td>" + entry.points + "</td>" +
+    "</tr>"
+  ).join("") +
+  "<tr>" +
+    "<th>Total</th><th>—</th><th>—</th><th>—</th>" +
+    "<th>" + r.totalCredits + "</th>" +
+    "<th>" + r.totalPoints + "</th>" +
+  "</tr>";
+
+  const report = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BHU MCA Semester ${r.semester} Result</title>
+<style>
+body{font-family:Arial,sans-serif;color:#14202b;margin:24px}
+h1,h2{color:#07365d}
+.head{display:flex;gap:16px;align-items:center}
+img{width:88px;height:108px;object-fit:cover;border:1px solid #cbd5e1}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.metric{padding:12px;background:#eef6ff;border-radius:8px}
+table{width:100%;border-collapse:collapse;margin-top:18px}
+th,td{padding:9px;border:1px solid #d9e2ec;text-align:left}
+th{background:#f1f5f9}
+.warning{margin-top:18px;font-size:12px;color:#9a3412}
+button{padding:10px 16px;margin-top:16px;cursor:pointer}
+@media print{button{display:none}body{margin:10mm}}
+</style>
+</head>
+<body>
+<h1>BHU MCA — SGPA &amp; CGPA Calculator</h1>
+
+<div class="head">
+  <img src="${studentPhotoData}" alt="Student photo">
+  <p>
+    <b>Name:</b> ${esc(r.student.name)}<br>
+    <b>Roll Number:</b> ${esc(r.student.roll || "—")}<br>
+    <b>Enrollment Number:</b> ${esc(r.student.enrollment || "—")}
+  </p>
+</div>
+
+<div class="metrics">
+  <div class="metric">Semester ${r.semester} SGPA: <b>${r.sgpa.toFixed(2)}</b></div>
+  <div class="metric">Semester Percentage: <b>${r.semesterPercentage.toFixed(2)}%</b></div>
+  <div class="metric">Cumulative CGPA: <b>${r.cgpa.toFixed(2)}</b></div>
+  <div class="metric">Cumulative Percentage: <b>${r.cumulativePercentage.toFixed(2)}%</b></div>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Course</th>
+<th>Final Marks</th>
+<th>Grade</th>
+<th>GP</th>
+<th>Credits</th>
+<th>Credit Points</th>
+</tr>
+</thead>
+<tbody>${rows}</tbody>
+</table>
+
+<p class="warning">
+Unofficial calculator result; not an official BHU marksheet.
+</p>
+
+<button onclick="window.print()">Print / Save as PDF</button>
+</body>
+</html>`;
+
+  const blob = new Blob([report], {
+    type: "text/html;charset=utf-8"
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download =
+    "BHU_MCA_Semester_" + r.semester + "_Result.html";
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+// Initialize the calculator.
+showSemester(1);
+</script>
+
+</body>
+</html>
