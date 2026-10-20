@@ -657,4 +657,158 @@ function showSemester(n) {
     el.classList.toggle("active", el.id === "sem" + n);
   });
 
-  document.
+  document.querySelectorAll(".sem-tab").forEach((el, i) => {
+    el.classList.toggle("active", i === n - 1);
+  });
+
+  updateFinalMarks(n);
+}
+
+function grade(m) {
+  if (m >= 90) return ["S", 10];
+  if (m >= 80) return ["A", 9];
+  if (m >= 70) return ["B", 8];
+  if (m >= 60) return ["C", 7];
+  if (m >= 50) return ["D", 6];
+  if (m >= 40) return ["E", 5];
+  return ["F", 0];
+}
+
+function mark(id) {
+  const el = $(id);
+
+  if (!el || el.value.trim() === "") {
+    return null;
+  }
+
+  const n = Number(el.value);
+
+  return Number.isFinite(n) && n >= 0 && n <= 100
+    ? n
+    : null;
+}
+
+function weighted(theoryId, practicalId) {
+  const theory = mark(theoryId);
+  const practical = mark(practicalId);
+
+  if (theory === null || practical === null) {
+    return null;
+  }
+
+  return theory * 0.6 + practical * 0.4;
+}
+
+function esc(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[c]);
+}
+
+function getCourses(n) {
+  if (n === 1) {
+    return [
+      ["s1_dsa", "Data Structures and Algorithms", 6, "s1_dsa_t", "s1_dsa_p"],
+      ["s1_oop", "Object Oriented Programming", 5, "s1_oop_t", "s1_oop_p"],
+      ["s1_se", "Software Engineering", 3],
+      ["s1_cn", "Computer Networks", 4],
+      ["s1_comm", "Communication Skills", 2]
+    ];
+  }
+
+  if (n === 2) {
+    return [
+      ["s2_dbms", "Database Management Systems", 6, "s2_dbms_t", "s2_dbms_p"],
+      ["s2_ai", "Artificial Intelligence", 4],
+      ["s2_elective1", "Major Elective I", 4, "s2_elective1_t", "s2_elective1_p"],
+      ["s2_elective2", "Major Elective II", 4, "s2_elective2_t", "s2_elective2_p"],
+      ["s2_swayam", "SWAYAM", 2]
+    ];
+  }
+
+  if (n === 3) {
+    return [
+      ["s3_ml", "Machine Learning", 5, "s3_ml_t", "s3_ml_p"],
+      ["s3_elective3", "Major Elective III", 4, "s3_elective3_t", "s3_elective3_p"],
+      ["s3_elective4", "Major Elective IV", 4, "s3_elective4_t", "s3_elective4_p"],
+      ["s3_tw", "Technical Writing & Seminar", 2],
+      ["s3_swayam", "SWAYAM", 2],
+      ["s3_project", "Minor Project", 3]
+    ];
+  }
+
+  return [
+    ["s4_swayam", "SWAYAM", 2],
+    ["s4_viva", "Comprehensive Viva", 2],
+    ["s4_project", "Major Project / Industrial Training", 16]
+  ];
+}
+
+function courseName(course) {
+  const nameInput = $(course[0] + "_name");
+
+  return nameInput && nameInput.value.trim()
+    ? nameInput.value.trim()
+    : course[1];
+}
+
+function courseMarks(course) {
+  if (course[3] && course[4]) {
+    return weighted(course[3], course[4]);
+  }
+
+  return mark(course[0]);
+}
+
+function updateFinalMarks(n) {
+  getCourses(n).forEach(course => {
+    const output = $(course[0] + "_f");
+
+    if (output) {
+      const m = courseMarks(course);
+      output.textContent = m === null ? "—" : m.toFixed(2);
+    }
+  });
+}
+
+document.querySelectorAll(".mark").forEach(input => {
+  input.addEventListener("input", function() {
+    updateFinalMarks(selectedSemester);
+  });
+});
+
+function calculate() {
+  const name = $("name").value.trim();
+
+  if (!name) {
+    alert("Please enter the student's name.");
+    $("name").focus();
+    return;
+  }
+
+  const courses = getCourses(selectedSemester);
+  const entries = [];
+  const errors = [];
+
+  courses.forEach(course => {
+    const m = courseMarks(course);
+
+    if (m === null) {
+      errors.push(
+        "Enter valid marks (0–100) for " + courseName(course) + "."
+      );
+      return;
+    }
+
+    const nameInput = $(course[0] + "_name");
+
+    if (nameInput && !nameInput.value.trim()) {
+      errors.push(
+        "Enter the elective subject name for " + course[1] + "."
+      );
+      return;
+    }
